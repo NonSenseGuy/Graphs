@@ -5,7 +5,7 @@ public class Vertex<T> {
 	public final static int GRAY = 1;
 	public final static int BLACK = 2;
 	private T value;
-	private int d;
+	private double d;
 	private int f;
 	private int color;
 	private Vertex<T> pred;
@@ -22,11 +22,11 @@ public class Vertex<T> {
 		this.value = value;
 	}
 
-	public int getD() {
+	public double getD() {
 		return d;
 	}
 
-	public void setD(int d) {
+	public void setD(double d) {
 		this.d = d;
 	}
 

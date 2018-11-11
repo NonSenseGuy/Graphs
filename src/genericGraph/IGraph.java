@@ -14,9 +14,9 @@ public interface IGraph<T> {
 	public int numEdges();
 	public int numVertices();
 	public void bfs(Vertex<T> startVertex);
-	public void dfs(Vertex<T> startVertex);
 	public void bellmanford(Vertex<T> starVertex);
 	void removeVertex(Vertex<T> v);
+	void dfs();
 	
 	
 }

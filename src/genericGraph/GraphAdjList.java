@@ -2,6 +2,8 @@ package genericGraph;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 public class GraphAdjList<T> implements IGraph<T>{
@@ -10,11 +12,14 @@ public class GraphAdjList<T> implements IGraph<T>{
 	private final HashMap<Vertex<T>,Set<Edge<T>>> adjList;
 	private boolean isDirected;
 	private boolean isWeighted;
+	private int time;
 	
 	public GraphAdjList(boolean isDirected, boolean isWeighted) {
 		adjList = new HashMap<>();
 		numVertices = 0;
 		numEdges = 0;
+		this.isDirected = isDirected;
+		this.isWeighted = isWeighted;
 	}
 	
 	public int getNumVertices() {
@@ -52,7 +57,11 @@ public class GraphAdjList<T> implements IGraph<T>{
 	public void setWeighted(boolean isWeighted) {
 		this.isWeighted = isWeighted;
 	}
-
+	
+	public void addVertex(T element) {
+		addVertex(new Vertex<T>(element));
+	}
+	
 	@Override
 	public void addVertex(Vertex<T> v) throws IllegalArgumentException {
 		if(!adjList.containsKey(v)) {
@@ -79,7 +88,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException{
-		if(!adjList.containsKey(v1) && !adjList.containsKey(v2)) {
+		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			if(!isDirected) {
 				adjList.get(v2).add(new Edge<T>(v2,v1, w));
 			}
@@ -179,18 +188,84 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	@Override
 	public void bfs(Vertex<T> startVertex) {
-		// TODO Auto-generated method stub
+		for(Vertex<T> u: getVertices()) {
+			u.setColor(Vertex.WHITE);
+			u.setD(Integer.MAX_VALUE);
+			u.setPred(null);
+		}
+		startVertex.setColor(Vertex.GRAY);
+		startVertex.setD(0);
+		startVertex.setPred(null);
+		Queue<Vertex<T>> queue = new LinkedList<Vertex<T>>();
+		while(!queue.isEmpty()) {
+			Vertex<T> u = queue.poll();
+			for(Edge<T> e: adjList.get(u)) {
+				Vertex<T> v = e.endVertex();
+				if(v.getColor() == Vertex.WHITE) {
+					v.setColor(Vertex.GRAY);
+					v.setD(u.getD()+1);
+					v.setPred(u);
+					queue.offer(v);
+				}
+			}
+			u.setColor(Vertex.BLACK);
+		}
 		
 	}
 	@Override
-	public void dfs(Vertex<T> startVertex) {
-		// TODO Auto-generated method stub
-		
+	public void dfs() {
+		for(Vertex<T> u: getVertices()) {
+			u.setColor(Vertex.WHITE);
+			u.setPred(null);
+		}
+		time = 0;
+		for(Vertex<T> u: getVertices()) {
+			if(u.getColor() == Vertex.WHITE) {
+				dfsVisit(u);
+			}
+		}
 	}
+	
+	public void dfsVisit(Vertex<T>u){
+		time++;
+		u.setD(time);
+		u.setColor(Vertex.GRAY);
+		for(Edge<T> e: adjList.get(u)) {
+			Vertex<T> v = e.endVertex();
+			if(v.getColor() == Vertex.WHITE) {
+				v.setPred(u);
+				dfsVisit(v);
+			}
+		}
+		u.setColor(Vertex.BLACK);
+		time++;
+		u.setF(time);
+	}
+	
 	@Override
-	public void bellmanford(Vertex<T> starVertex) {
-		// TODO Auto-generated method stub
-		
+	public void bellmanford(Vertex<T> startVertex) {
+//		initializeSingleSource(startVertex);
+//		for(Vertex<T> u:getVertices()) {
+//			for(Edge<T> e: adjList.get(u)) {
+//				relax(e.initVertex(),e.endVertex());
+//			}
+//			
+//		}
+	}
+	
+	public void initializeSingleSource(Vertex<T> s) {
+		for(Vertex<T> v: getVertices()) {
+			v.setD(Integer.MAX_VALUE);
+			v.setPred(null);
+		}
+		s.setD(0);
+	}
+	
+	public void relax(Vertex<T> u,Vertex<T> v) {
+		if(v.getD() > u.getD() + getEdge(u,v).getWeight()) {
+			v.setD(u.getD() + getEdge(u,v).getWeight());
+			v.setPred(u);
+		}
 	}
 	
 	
