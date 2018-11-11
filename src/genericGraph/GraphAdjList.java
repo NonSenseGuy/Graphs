@@ -64,37 +64,70 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 		
 	@Override
-	public void addEdge(Vertex<T> v1, Vertex<T> v2) {
+	public void addEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException{
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			if(!isDirected) {
 				adjList.get(v2).add(new Edge<T>(v2,v1, 1.0));
 			}
 			adjList.get(v1).add(new Edge<T>(v1,v2, 1.0));
 			numEdges++;
+		}else {
+			throw new IllegalArgumentException();
 		}
 		
 		
 	}
 	@Override
-	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) {
-		if(!isDirected) {
-			adjList.get(v2).add(new Edge<T>(v2,v1, w));
+	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException{
+		if(!adjList.containsKey(v1) && !adjList.containsKey(v2)) {
+			if(!isDirected) {
+				adjList.get(v2).add(new Edge<T>(v2,v1, w));
+			}
+			adjList.get(v1).add(new Edge<T>(v1,v2, w));
+			numEdges++;
+		}else {
+			throw new IllegalArgumentException();
 		}
-		adjList.get(v1).add(new Edge<T>(v1,v2, w));
-		numEdges++;
-	}
-	@Override
-	public void removeVertex(Object t) {
 		
+	}
+	
+	@Override
+	public void removeVertex(Vertex<T> v) throws IllegalArgumentException{
+		if(adjList.containsKey(v)) {
+			for(Vertex<T> vertex: getVertices()) {
+				for(Edge<T> edge: adjList.get(vertex)) {
+					if(edge.endVertex().equals(vertex.getValue())) {
+						adjList.get(vertex).remove(edge);
+						return;
+					}
+				}
+			}
+		}else {
+			throw new IllegalArgumentException("Vertex not found");
+		}
 	}
 	@Override
 	public void removeEdge(Vertex<T> v1, Vertex<T> v2) {
-		// TODO Auto-generated method stub
+		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
+			for(Edge<T> edge: adjList.get(v1)) {
+				if(edge.endVertex().equals(v2)) {
+					adjList.get(v1).remove(edge);
+					return;
+				}
+			}
+		}else{
+			throw new IllegalArgumentException("Vertex not found");
+		}
 		
 	}
 	@Override
-	public Vertex<T> getVertex(T valueVertex) {
-		return null;
+	public Vertex<T> getVertex(T valueVertex) throws IllegalArgumentException{
+		for(Vertex<T> v: getVertices()) {
+			if(v.getValue().equals(valueVertex)) {
+				return v;
+			}
+		}
+		throw new IllegalArgumentException("Vertex not found");
 	}
 	@Override
 	public Iterable<Vertex<T>> getVertices() {
@@ -102,11 +135,39 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	@Override
 	public double getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
-		return -1;
+		if(adjList.containsKey(v1)) {
+			for(Edge<T> edge: adjList.get(v1)) {
+				if(edge.endVertex().equals(v2)){
+					return edge.getWeight();
+				}
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 	@Override
 	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, double w)throws IllegalArgumentException {
-		
+		if(adjList.containsKey(v1)) {
+			for(Edge<T> edge: adjList.get(v1)) {
+				if(edge.endVertex().equals(v2)){
+					edge.setWeight(w);
+					return;
+				}
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+	
+	public Edge<T> getEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException{
+		for(Edge<T> edge: adjList.get(v1)) {
+			if(edge.endVertex().equals(v2)) {
+				return edge;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+	
+	public Iterable<Edge<T>> getEdges(Vertex<T> v1) throws IllegalArgumentException{
+		return adjList.get(v1);
 	}
 	@Override
 	public int numEdges() {
