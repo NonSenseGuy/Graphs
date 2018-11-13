@@ -267,6 +267,31 @@ public class GraphAdjList<T> implements IGraph<T>{
 			v.setPred(u);
 		}
 	}
+
+	@Override
+	public boolean areAdjacent(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
+		if(!adjList.containsKey(v1) || !adjList.containsKey(v2)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
+		for(Edge<T> e: adjList.get(v1)) {
+			if(e.endVertex().equals(v2)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Set<Vertex<T>> adjacentVertices(Vertex<T> v) throws IllegalArgumentException{
+		if(!adjList.containsKey(v)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
+		Set<Vertex<T>> adjVertices = new HashSet<Vertex<T>>();
+		for(Edge<T> e: adjList.get(v)) {
+			adjVertices.add(e.endVertex());
+		}
+		return adjVertices;
+	}
 	
 	
 }
