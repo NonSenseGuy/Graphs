@@ -15,7 +15,7 @@ public interface IGraph<T> {
 	public int numEdges();
 	public int numVertices();
 	public void bfs(Vertex<T> startVertex);
-	public void bellmanford(Vertex<T> starVertex);
+	public boolean bellmanford(Vertex<T> starVertex);
 	public void removeVertex(Vertex<T> v);
 	public void dfs();
 	public boolean areAdjacent(Vertex<T> v1, Vertex<T> v2);

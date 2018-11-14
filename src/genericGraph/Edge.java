@@ -1,6 +1,6 @@
 package genericGraph;
 
-public class Edge<T> {
+public class Edge<T> implements Comparable<Edge<T>> {
 	private Vertex<T> v1;
 	private Vertex<T> v2;
 	private double w;
@@ -30,6 +30,17 @@ public class Edge<T> {
 	@Override
 	public String toString() {
 		return "(" + v1 + "," + v2 + ")";
+	}
+
+	@Override
+	public int compareTo(Edge<T> o) {
+		if(w > o.getWeight()) {
+			return 1;
+		}else if(w == o.getWeight()) {
+			return 0;
+		}else {
+			return -1;
+		}
 	}
 	
 }

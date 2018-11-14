@@ -130,9 +130,8 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 	}
 
 	@Override
-	public void bellmanford(Vertex<T> starVertex) {
-		// TODO Auto-generated method stub
-		
+	public boolean bellmanford(Vertex<T> starVertex) {
+		return false;
 	}
 
 	@Override
@@ -162,6 +161,23 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 	public Set<Vertex<T>> adjacentVertices(Vertex<T> v) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(int i = 0; i < adjMatrix.length; i++) {
+			if(verticesList.get(i) != null) {
+				s+= "Vertice " + verticesList.get(i) + "={";
+				for(int j = 0; j < adjMatrix[0].length; j++) {
+					if(adjMatrix[i][j] != Integer.MIN_VALUE) {
+						s += "(" + verticesList.get(i) + "," + verticesList.get(j) + "," + adjMatrix[i][j] + ")";
+					}
+				}
+				s+= "} \n";
+			}
+		}
+		return s;
 	}
 
 }

@@ -1,8 +1,10 @@
 package genericGraph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	private final HashMap<Vertex<T>,Set<Edge<T>>> adjList;
 	private boolean isDirected;
 	private boolean isWeighted;
+	private Vertex<T> refVertex;
 	private int time;
 	
 	public GraphAdjList(boolean isDirected, boolean isWeighted) {
@@ -20,6 +23,10 @@ public class GraphAdjList<T> implements IGraph<T>{
 		numEdges = 0;
 		this.isDirected = isDirected;
 		this.isWeighted = isWeighted;
+	}
+	
+	public Vertex<T> getRefVertex(){
+		return refVertex;
 	}
 	
 	public int getNumVertices() {
@@ -103,14 +110,12 @@ public class GraphAdjList<T> implements IGraph<T>{
 	@Override
 	public void removeVertex(Vertex<T> v) throws IllegalArgumentException{
 		if(adjList.containsKey(v)) {
-			for(Vertex<T> vertex: getVertices()) {
-				for(Edge<T> edge: adjList.get(vertex)) {
-					if(edge.endVertex().equals(vertex.getValue())) {
-						adjList.get(vertex).remove(edge);
-						return;
-					}
+			for(Edge<T> e: getEdges()) {
+				if(e.initVertex().getValue().equals(v.getValue()) || e.endVertex().getValue().equals(v.getValue())) {
+					removeEdge(e.initVertex(), e.endVertex());
 				}
 			}
+			adjList.remove(v);
 		}else {
 			throw new IllegalArgumentException("Vertex not found");
 		}
@@ -188,6 +193,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	@Override
 	public void bfs(Vertex<T> startVertex) {
+		refVertex = startVertex;
 		for(Vertex<T> u: getVertices()) {
 			u.setColor(Vertex.WHITE);
 			u.setD(Integer.MAX_VALUE);
@@ -243,14 +249,27 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	
 	@Override
-	public void bellmanford(Vertex<T> startVertex) {
-//		initializeSingleSource(startVertex);
-//		for(Vertex<T> u:getVertices()) {
-//			for(Edge<T> e: adjList.get(u)) {
-//				relax(e.initVertex(),e.endVertex());
+	public boolean bellmanford(Vertex<T> startVertex) {
+		refVertex = startVertex;
+		initializeSingleSource(startVertex);
+		for(Vertex<T> v: getVertices()) {
+			for(Edge<T> edge: adjList.get(v)) {
+				relax(edge.initVertex(),edge.endVertex());
+			}
+		}
+		for(Edge<T> e: getEdges()) {
+			if(e.endVertex().getD() > e.initVertex().getD() + e.getWeight()) {
+				return false;
+			}
+		}
+//		for(Vertex<T> v: getVertices()) {
+//			for(Edge<T> e: adjList.get(v)) {
+//				if(e.endVertex().getD() > e.initVertex().getD() + e.getWeight()) {
+//					return false;
+//				}
 //			}
-//			
 //		}
+		return true;
 	}
 	
 	public void initializeSingleSource(Vertex<T> s) {
@@ -262,8 +281,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	
 	public void relax(Vertex<T> u,Vertex<T> v) {
-		if(v.getD() > u.getD() + getEdge(u,v).getWeight()) {
-			v.setD(u.getD() + getEdge(u,v).getWeight());
+		double tempDistance = u.getD() + getEdge(u,v).getWeight();
+		if(v.getD() > tempDistance) {
+			v.setD(tempDistance);
 			v.setPred(u);
 		}
 	}
@@ -293,5 +313,39 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return adjVertices;
 	}
 	
+	public void djikstra(Vertex<T> s) {
+		initializeSingleSource(s);
+		Queue<Vertex<T>> priorityQ = new PriorityQueue<>();
+		priorityQ.addAll(adjList.keySet());
+		while(!priorityQ.isEmpty()) {
+			Vertex<T> u = priorityQ.poll();
+			for(Edge<T> e: adjList.get(u)) {
+				relax(u,e.endVertex());
+			}
+		}
+	}
+	
+	public Iterable<Edge<T>> getEdges(){
+		ArrayList<Edge<T>> edgesList = new ArrayList<Edge<T>>();
+		for(Vertex<T> v:getVertices()) {
+			for(Edge<T> e: adjList.get(v)) {
+				edgesList.add(e);
+			}
+		}
+		return edgesList;
+	}	
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(Vertex<T> v:getVertices()) {
+			s+= "Vertice " + v + "={";
+			for(Edge<T> e: adjList.get(v)) {
+				s+= e;
+			}
+			s += "}\n";
+		}
+		return s;
+	}
 	
 }
