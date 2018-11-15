@@ -77,6 +77,10 @@ class GraphTestCases {
 		graph.addVertex(v1);
 		graph.addVertex(v2);
 		graph.addVertex(v3);
+		graph.addEdge(v1, v3);
+		graph.addEdge(v2, v1);
+		graph.addEdge(v3, v2);
+		graph.addEdge(graph.getVertex(1), v3);
 	}
 	
 	void setup3() {
@@ -182,6 +186,12 @@ class GraphTestCases {
 		assertTrue(graph.bellmanford(graph.getVertex(4)));
 	}
 	
+//	@Test
+//	void bfs() {
+//		setupMoreVertex();
+//		graph.bfs(graph.getVertex(1));
+//		int v = graph.getVertex(2).getValue();
+//	}
 	
 
 }

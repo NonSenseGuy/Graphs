@@ -7,7 +7,18 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-
+/**
+ * @author Alejandro Barrera Lozano
+ * Adjacency list graph
+ * This graph implementation can be used as:
+ * Simple graph
+ * Directed graph
+ * Simple weighted graph
+ * Directed weighted graph
+ * 
+ *
+ * @param <T>
+ */
 public class GraphAdjList<T> implements IGraph<T>{
 	private int numVertices;
 	private int numEdges;
@@ -25,50 +36,63 @@ public class GraphAdjList<T> implements IGraph<T>{
 		this.isWeighted = isWeighted;
 	}
 	
+	/**
+	 * RefVertex -> Last vertex used as the start vertex of a shortest path algorithm
+	 * @return refVertex
+	 */
 	public Vertex<T> getRefVertex(){
 		return refVertex;
 	}
-	
+	/**
+	 * numVertices -> Amount of vertices in the graph
+	 * @return numVertices 
+	 */
+	@Override
 	public int getNumVertices() {
 		return numVertices;
 	}
-
-	public void setNumVertices(int numVertices){
-		this.numVertices = numVertices;
-	}
-
+	/**
+	 * numEdges -> Amount of edges between each vertex in the graph
+	 * @return numEdges
+	 */
+	@Override
 	public int getNumEdges() {
 		return numEdges;
 	}
-
-	public void setNumEdges(int numEdges) {
-		this.numEdges = numEdges;
-	}
-
+	/**
+	 * adjList -> Adjacent list graph representation, Hash map that contains every vertex with all of its associations
+	 * @return
+	 */
 	public HashMap<Vertex<T>, Set<Edge<T>>> getAdjList() {
 		return adjList;
 	}
-
+	/**
+	 * isDirected -> Shows if the graph is directed or not
+	 * @return isDirected
+	 */
 	public boolean isDirected() {
 		return isDirected;
 	}
-
-	public void setDirected(boolean isDirected) {
-		this.isDirected = isDirected;
-	}
-
+	/**
+	 * isWeighted -> Shows if the edges of the graph are weighted or not
+	 * In case that is false the weight of all the edges will be 1.0
+	 * @return isWeighted
+	 */
 	public boolean isWeighted() {
 		return isWeighted;
 	}
-
-	public void setWeighted(boolean isWeighted) {
-		this.isWeighted = isWeighted;
-	}
 	
+	/**
+	 * Add a vertex to the graph
+	 * @param element, unique id of the new Vertex
+	 */
 	public void addVertex(T element) {
 		addVertex(new Vertex<T>(element));
 	}
-	
+	/**
+	 * Add a vertex to the graph
+	 * @param vertex, already instantiated 
+	 */
 	@Override
 	public void addVertex(Vertex<T> v) throws IllegalArgumentException {
 		if(!adjList.containsKey(v)) {
@@ -78,7 +102,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 			throw new IllegalArgumentException("Vertex alredy exists");
 		}
 	}
-		
+	/**
+	 * Adds a edge between a pair of vertices with weight 1.0	
+	 */
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException{
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
@@ -90,9 +116,11 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}else {
 			throw new IllegalArgumentException();
 		}
-		
-		
 	}
+	
+	/**
+	 * Adds a edge between a pair of vertices with weight w
+	 */
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException{
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
@@ -106,7 +134,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		
 	}
-	
+	/**
+	 * Removes a vertex and all of its associated edges of the graph
+	 */
 	@Override
 	public void removeVertex(Vertex<T> v) throws IllegalArgumentException{
 		if(adjList.containsKey(v)) {
@@ -120,6 +150,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 			throw new IllegalArgumentException("Vertex not found");
 		}
 	}
+	/**
+	 * Removes the edge between a pair of vertices
+	 */
 	@Override
 	public void removeEdge(Vertex<T> v1, Vertex<T> v2) {
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
@@ -134,6 +167,11 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		
 	}
+	/**
+	 * Gets a vertex searching it by its unique key
+	 * @param valueVertex -> Unique key
+	 * @return v, Vertex<T>
+	 */
 	@Override
 	public Vertex<T> getVertex(T valueVertex) throws IllegalArgumentException{
 		for(Vertex<T> v: getVertices()) {
@@ -143,10 +181,18 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		throw new IllegalArgumentException("Vertex not found");
 	}
+	/**
+	 * Gets all of the vertices of the graph
+	 * @return VerticesList
+	 */
 	@Override
 	public Iterable<Vertex<T>> getVertices() {
 		return adjList.keySet();
 	}
+	/**
+	 * Gets the weight of a given edge
+	 * @return weight
+	 */
 	@Override
 	public double getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
 		if(adjList.containsKey(v1)) {
@@ -170,7 +216,13 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		throw new IllegalArgumentException();
 	}
-	
+	/**
+	 * gets the edge between given pair of vertices
+	 * @param v1
+	 * @param v2
+	 * @return edge
+	 * @throws IllegalArgumentException
+	 */
 	public Edge<T> getEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException{
 		for(Edge<T> edge: adjList.get(v1)) {
 			if(edge.endVertex().equals(v2)) {
@@ -179,30 +231,33 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		throw new IllegalArgumentException();
 	}
-	
+	/**
+	 * Gets all of the edges in the graph
+	 * @param v1
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	public Iterable<Edge<T>> getEdges(Vertex<T> v1) throws IllegalArgumentException{
 		return adjList.get(v1);
 	}
+	
 	@Override
-	public int numEdges() {
-		return this.numEdges;
-	}
-	@Override
-	public int numVertices() {
-		return this.numVertices;
-	}
-	@Override
-	public void bfs(Vertex<T> startVertex) {
-		refVertex = startVertex;
+	public void bfs(Vertex<T> startVertex) throws IllegalArgumentException{
+		if(!adjList.containsKey(startVertex)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
 		for(Vertex<T> u: getVertices()) {
-			u.setColor(Vertex.WHITE);
-			u.setD(Integer.MAX_VALUE);
-			u.setPred(null);
+			if(!u.equals(startVertex)) {
+				u.setColor(Vertex.WHITE);
+				u.setD(INF);
+				u.setPred(null);
+			}
 		}
 		startVertex.setColor(Vertex.GRAY);
 		startVertex.setD(0);
 		startVertex.setPred(null);
 		Queue<Vertex<T>> queue = new LinkedList<Vertex<T>>();
+		queue.offer(startVertex);
 		while(!queue.isEmpty()) {
 			Vertex<T> u = queue.poll();
 			for(Edge<T> e: adjList.get(u)) {
@@ -247,13 +302,20 @@ public class GraphAdjList<T> implements IGraph<T>{
 		time++;
 		u.setF(time);
 	}
-	
+	/**
+	 * Evaluates if there is a negative cycle in the graph 
+	 * returns false in case it is one
+	 * @return isThereANegativeCycle
+	 */
 	@Override
-	public boolean bellmanford(Vertex<T> startVertex) {
+	public boolean bellmanford(Vertex<T> startVertex) throws IllegalArgumentException{
+		if(!adjList.containsKey(startVertex)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
 		refVertex = startVertex;
 		initializeSingleSource(startVertex);
-		for(Vertex<T> v: getVertices()) {
-			for(Edge<T> edge: adjList.get(v)) {
+		for(int i = 0; i < adjList.size(); i++) {
+			for(Edge<T> edge: getEdges()) {
 				relax(edge.initVertex(),edge.endVertex());
 			}
 		}
@@ -262,24 +324,19 @@ public class GraphAdjList<T> implements IGraph<T>{
 				return false;
 			}
 		}
-//		for(Vertex<T> v: getVertices()) {
-//			for(Edge<T> e: adjList.get(v)) {
-//				if(e.endVertex().getD() > e.initVertex().getD() + e.getWeight()) {
-//					return false;
-//				}
-//			}
-//		}
 		return true;
 	}
 	
+	@Override
 	public void initializeSingleSource(Vertex<T> s) {
 		for(Vertex<T> v: getVertices()) {
-			v.setD(Integer.MAX_VALUE);
+			v.setD(INF);
 			v.setPred(null);
 		}
 		s.setD(0);
 	}
 	
+	@Override
 	public void relax(Vertex<T> u,Vertex<T> v) {
 		double tempDistance = u.getD() + getEdge(u,v).getWeight();
 		if(v.getD() > tempDistance) {
@@ -287,7 +344,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 			v.setPred(u);
 		}
 	}
-
+	/**
+	 * Evaluates of a given pair of vertices are adjacent
+	 */
 	@Override
 	public boolean areAdjacent(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
 		if(!adjList.containsKey(v1) || !adjList.containsKey(v2)) {
@@ -300,7 +359,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		return false;
 	}
-
+	
 	@Override
 	public Set<Vertex<T>> adjacentVertices(Vertex<T> v) throws IllegalArgumentException{
 		if(!adjList.containsKey(v)) {
@@ -312,11 +371,19 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		return adjVertices;
 	}
-	
-	public void djikstra(Vertex<T> s) {
+	/**
+	 * Find the shortest path between each vertex of the graph and a start vertex
+	 * @param s -> start vertex
+	 */
+	@Override
+	public void dijkstra(Vertex<T> s) throws IllegalArgumentException {
+		if(!adjList.containsKey(s)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
 		initializeSingleSource(s);
 		Queue<Vertex<T>> priorityQ = new PriorityQueue<>();
 		priorityQ.addAll(adjList.keySet());
+		
 		while(!priorityQ.isEmpty()) {
 			Vertex<T> u = priorityQ.poll();
 			for(Edge<T> e: adjList.get(u)) {
@@ -324,7 +391,11 @@ public class GraphAdjList<T> implements IGraph<T>{
 			}
 		}
 	}
-	
+	/**
+	 * Gets all of the edges in the graph
+	 * @return edgesList
+	 */
+	@Override
 	public Iterable<Edge<T>> getEdges(){
 		ArrayList<Edge<T>> edgesList = new ArrayList<Edge<T>>();
 		for(Vertex<T> v:getVertices()) {
@@ -334,6 +405,25 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		return edgesList;
 	}	
+	/**
+	 * Gets the path between the last vertex used as reference in a shortest path algorithm 
+	 * and a given vertex in the graph
+	 * Assuming that the graph is connected
+	 */
+	@Override
+	public ArrayList<Vertex<T>> vertexPath(Vertex<T> startVertex, Vertex<T> endVertex) throws IllegalArgumentException {
+		if(!adjList.containsKey(endVertex)) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
+		Vertex<T> aux = endVertex;
+		ArrayList<Vertex<T>> path = new ArrayList<>();
+		while(aux.getD() != 0) {
+			path.add(aux);
+			aux = aux.getPred();
+		}
+		path.add(aux);
+		return path;
+	}
 	
 	@Override
 	public String toString() {
@@ -347,5 +437,24 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		return s;
 	}
+
+	@Override
+	public void floydwarshall() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void prim() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void kruskal() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }

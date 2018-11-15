@@ -114,16 +114,6 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 	}
 
 	@Override
-	public int numEdges() {
-		return numEdges;
-	}
-
-	@Override
-	public int numVertices() {
-		return numVertices;
-	}
-
-	@Override
 	public void bfs(Vertex<T> startVertex) {
 		// TODO Auto-generated method stub
 		
@@ -142,6 +132,10 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 		int i = verticesList.indexOf(v);
 		verticesList.remove(i);
 		Arrays.fill(adjMatrix[i], Integer.MIN_VALUE);
+		for(int j = 0; j < adjMatrix.length; j++) {
+			adjMatrix[j][i] = Integer.MIN_VALUE;
+		}
+		
 		
 	}
 
@@ -179,5 +173,47 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 		}
 		return s;
 	}
+	
+	
+	@Override
+	public void dijkstra(Vertex<T> s) {
+		
+	}
 
+	@Override
+	public void initializeSingleSource(Vertex<T> s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void relax(Vertex<T> s, Vertex<T> e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Iterable<Edge<T>> getEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getNumVertices() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getNumEdges() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public ArrayList<Vertex<T>> vertexPath(Vertex<T> startVertex, Vertex<T> endVertex) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }
