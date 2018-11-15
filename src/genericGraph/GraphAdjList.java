@@ -380,17 +380,41 @@ public class GraphAdjList<T> implements IGraph<T>{
 		if(!adjList.containsKey(s)) {
 			throw new IllegalArgumentException("Vertex not found");
 		}
-		initializeSingleSource(s);
-		Queue<Vertex<T>> priorityQ = new PriorityQueue<>();
-		priorityQ.addAll(adjList.keySet());
 		
-		while(!priorityQ.isEmpty()) {
+		initializeSingleSource(s);
+		Queue<Vertex<T>> priorityQ = new PriorityQueue<>(new VertexWeightComparator<Vertex<T>>());
+		priorityQ.addAll(adjList.keySet());
+		Set<Vertex<T>> vertexSet = new HashSet<Vertex<T>>();
+		while(!priorityQ.isEmpty() && !vertexSet.contains(priorityQ.peek())) {
 			Vertex<T> u = priorityQ.poll();
 			for(Edge<T> e: adjList.get(u)) {
 				relax(u,e.endVertex());
 			}
+			vertexSet.add(u);
 		}
 	}
+//	
+//	public void dijkstra2(Vertex<T> s) throws IllegalArgumentException{
+//		if(!adjList.containsKey(s)) {
+//			throw new IllegalArgumentException("Vertex not found");
+//		}
+//		initializeSingleSource(s);
+//		Set<Vertex<T>> unsettledVertex = new HashSet<Vertex<T>>();
+//		Set<Vertex<T>> settledVertex = new HashSet<Vertex<T>>();
+//		unsettledVertex.add(s);
+//		while(!unsettledVertex.isEmpty()) {
+//			Vertex<T> evaluationVertex =  getVertexWithLowestIndex(unsettledVertex);
+//		}
+//	}
+	
+//	private Vertex<T> getVertexWithLowestDistance(Set<Vertex<T>> vertexSet){
+//		double min = INF;
+//		for(Vertex<T> v : vertexSet) {
+//			if(v.getD() < min) {
+//				
+//			}
+//		}
+//	}
 	/**
 	 * Gets all of the edges in the graph
 	 * @return edgesList

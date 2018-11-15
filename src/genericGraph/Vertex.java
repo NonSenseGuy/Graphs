@@ -1,6 +1,6 @@
 package genericGraph;
 
-public class Vertex<T> {
+public class Vertex<T> implements Comparable<Vertex<T>> {
 	public final static int WHITE = 0;
 	public final static int GRAY = 1;
 	public final static int BLACK = 2;
@@ -58,6 +58,18 @@ public class Vertex<T> {
 	public String toString() {
 		return ""+ value;
 	}
+
+	@Override
+	public int compareTo(Vertex<T> o) {
+		if(d < o.getD()) {
+			return -1;
+		}else if(d > o.getD()) {
+			return 1;
+		}else
+			return 0;
+	}
+	
+	
 	
 	
 }

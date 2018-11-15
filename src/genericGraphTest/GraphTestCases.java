@@ -186,12 +186,10 @@ class GraphTestCases {
 		assertTrue(graph.bellmanford(graph.getVertex(4)));
 	}
 	
-//	@Test
-//	void bfs() {
-//		setupMoreVertex();
-//		graph.bfs(graph.getVertex(1));
-//		int v = graph.getVertex(2).getValue();
-//	}
+	@Test 
+	void dijkstraTest(){
+		setupMoreVertex();
+	}
 	
 
 }

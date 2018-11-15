@@ -215,5 +215,23 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void floydwarshall() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void prim() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void kruskal() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
