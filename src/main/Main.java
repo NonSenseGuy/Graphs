@@ -29,21 +29,21 @@ public class Main {
 		graph.addVertex(v1);
 		graph.addVertex(v2);
 		graph.addVertex(v3);
-		graph.addEdge(v1, v3);
-		graph.addEdge(v2, v1);
-		graph.addEdge(v3, v2);
-		graph.addEdge(graph.getVertex(1), v3);
-		graph.addEdge(graph.getVertex(1), graph.getVertex(2));
+		graph.addEdge(v1, v3, 3.0);
+		graph.addEdge(v2, v1, 10.0);
+		graph.addEdge(v3, v2, 5.0);
+		graph.addEdge(graph.getVertex(1), v3, 20);
+		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
+		graph.addEdge(graph.getVertex(1), graph.getVertex(6));
 		
-		
-//		System.out.println(graph.bellmanford(v1));
-		System.out.println(graph);
-		graph.bfs(graph.getVertex(2));
-		for(Vertex<Integer> v: graph.vertexPath(graph.getVertex(16), graph.getVertex(6))) {
-			System.out.println("(" + v + "," + v.getPred()+ ")" + "Distancia -> " + v.getD());
+		graph.dijkstra(graph.getVertex(2));
+		for(Vertex<Integer> v : graph.getVertices()) {
+			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getD());
 		}
+		System.out.println("");
 		
 		
+		System.out.println(graph);
 //		
 //		graphMat.addVertex(v1);
 //		graphMat.addVertex(v2);

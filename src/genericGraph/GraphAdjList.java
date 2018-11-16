@@ -380,17 +380,18 @@ public class GraphAdjList<T> implements IGraph<T>{
 		if(!adjList.containsKey(s)) {
 			throw new IllegalArgumentException("Vertex not found");
 		}
-		
 		initializeSingleSource(s);
 		Queue<Vertex<T>> priorityQ = new PriorityQueue<>(new VertexWeightComparator<Vertex<T>>());
 		priorityQ.addAll(adjList.keySet());
 		Set<Vertex<T>> vertexSet = new HashSet<Vertex<T>>();
-		while(!priorityQ.isEmpty() && !vertexSet.contains(priorityQ.peek())) {
+		while(!priorityQ.isEmpty()) {
 			Vertex<T> u = priorityQ.poll();
-			for(Edge<T> e: adjList.get(u)) {
-				relax(u,e.endVertex());
+			if(!vertexSet.contains(priorityQ.peek())) {
+				for(Edge<T> e: adjList.get(u)) {
+					relax(u,e.endVertex());
+				}
+				vertexSet.add(u);
 			}
-			vertexSet.add(u);
 		}
 	}
 //	
