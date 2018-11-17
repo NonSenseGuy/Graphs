@@ -223,7 +223,7 @@ public class GraphAdjMatrix<T> implements IGraph<T> {
 	}
 
 	@Override
-	public void prim() {
+	public void prim(Vertex<T> v) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -36,7 +36,7 @@ public class Main {
 		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
 		graph.addEdge(graph.getVertex(1), graph.getVertex(6));
 		
-		graph.dijkstra(graph.getVertex(2));
+		graph.prim(graph.getVertex(2));
 		for(Vertex<Integer> v : graph.getVertices()) {
 			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getD());
 		}

@@ -1,6 +1,6 @@
 package genericGraph;
 
-public class Edge<T> implements Comparable<Edge<T>> {
+public class Edge<T> implements Comparable<Edge<T>>{
 	private Vertex<T> v1;
 	private Vertex<T> v2;
 	private double w;

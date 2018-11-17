@@ -81,6 +81,22 @@ class GraphTestCases {
 		graph.addEdge(v2, v1);
 		graph.addEdge(v3, v2);
 		graph.addEdge(graph.getVertex(1), v3);
+		graph.addEdge(graph.getVertex(2),graph.getVertex(1));
+	}
+	void setupMoreVertexWeighted() {
+		setup2();
+		Vertex<Integer> v1 = new Vertex<>(6);
+		Vertex<Integer> v2 = new Vertex<>(16);
+		Vertex<Integer> v3 = new Vertex<>(26);
+		graph.addVertex(v1);
+		graph.addVertex(v2);
+		graph.addVertex(v3);
+		graph.addEdge(v1, v3, 3.0);
+		graph.addEdge(v2, v1, 10.0);
+		graph.addEdge(v3, v2, 5.0);
+		graph.addEdge(graph.getVertex(1), v3, 20);
+		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
+		graph.addEdge(graph.getVertex(1), graph.getVertex(6));
 	}
 	
 	void setup3() {
@@ -93,19 +109,42 @@ class GraphTestCases {
 	@Test
 	void simpleAddVertexTest() {
 		setup();
-		Vertex<Integer> v = new Vertex<Integer>(1);
+		Vertex<Integer> v = new Vertex<Integer>(4);
 		graph.addVertex(v);
 		assertTrue(graph.getAdjList().keySet().contains(v));
 	}
 	
 	@Test
 	void simpleAddVertexTest2() {
-		setupMoreVertex();
-		assertTrue(graph.getAdjList().size() == 5);
+		setup();
+		graph.addVertex(10);
+		graph.addVertex(2);
+		graph.addVertex(5);
+		graph.addVertex(6);
+		assertTrue(graph.getAdjList().size() == 4 && graph.getAdjList().containsKey(graph.getVertex(6)));
 	}
 	
 	@Test
-	void simpleRemoveVertexTest() {
+	void getVertexTest() {
+		setup();
+		Vertex<Integer> v1 = new Vertex<Integer>(1);
+		v1.setColor(Vertex.BLACK);
+		v1.setD(4);
+		v1.setPred(null);
+		graph.addVertex(v1);
+		Vertex<Integer> v = graph.getVertex(1);
+		assertTrue(v.getColor() == Vertex.BLACK && v.getD() == 4 && v.getPred() == null && v.equals(v1));
+	}
+	
+	@Test
+	void simpleRemoveVertexText() {
+		setup();
+		graph.addVertex(4);
+		graph.removeVertex(graph.getVertex(4));
+		assertTrue(graph.getAdjList().isEmpty());
+	}
+	@Test
+	void simpleRemoveVertexTest2() {
 		setup3();
 		Vertex<Integer> v1 = graph.getVertex(1);
 		Vertex<Integer> v2 = graph.getVertex(2);
@@ -125,12 +164,7 @@ class GraphTestCases {
 		Vertex<Integer> v1 = graph.getVertex(1);
 		Vertex<Integer> v2 = graph.getVertex(2);
 		graph.addEdge(v1, v2);
-		Edge<Integer> e = null;
-		for(Edge<Integer> edge: graph.getAdjList().get(v1)) {
-			if(edge.endVertex().equals(v2)){
-				e = edge;
-			}
-		}
+		Edge<Integer> e = graph.getEdge(v1, v2);
 		assertTrue(e.endVertex().getValue() == 2);
 	}
 	
@@ -188,8 +222,34 @@ class GraphTestCases {
 	
 	@Test 
 	void dijkstraTest(){
-		setupMoreVertex();
+		setupMoreVertexWeighted();
+		graph.dijkstra(graph.getVertex(2));
+		assertTrue(graph.getVertex(16).getPred() == graph.getVertex(26) && graph.getVertex(6).getPred() == graph.getVertex(1) && graph.getVertex(26).getPred() == graph.getVertex(6) && graph.getVertex(1).getPred() == graph.getVertex(2));	
 	}
+	
+	@Test
+	void dijkstraTest2() {
+		setupMoreVertexWeighted();
+		graph.setWeightEdge(graph.getVertex(26), graph.getVertex(1), 3);
+		graph.dijkstra(graph.getVertex(2));
+		assertTrue(graph.getVertex(26).getPred() == graph.getVertex(1));
+	}
+	
+	@Test
+	void prim() {
+		setupMoreVertexWeighted();
+		graph.prim(graph.getVertex(2));
+		Vertex<Integer> v1 = graph.getVertex(1);
+		Vertex<Integer> v2 = graph.getVertex(2);
+		Vertex<Integer> v3 = graph.getVertex(6);
+		Vertex<Integer> v4 = graph.getVertex(26);
+		Vertex<Integer> v5 = graph.getVertex(16);
+		
+		assertTrue(v1.getPred() == v2 && v2.getPred() == null && v3.getPred() == v1 && v4.getPred() == v3 && v5.getPred() == v4);
+	}
+	
+	
+	
 	
 
 }

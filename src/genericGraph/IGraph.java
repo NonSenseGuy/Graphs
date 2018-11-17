@@ -28,8 +28,8 @@ public interface IGraph<T> {
 	public int getNumEdges();
 	public ArrayList<Vertex<T>> vertexPath(Vertex<T> startVertex, Vertex<T> endVertex) throws IllegalArgumentException;
 	public void floydwarshall();
-	public void prim();
 	public void kruskal();
+	public void prim(Vertex<T> v);
 	
 	
 }

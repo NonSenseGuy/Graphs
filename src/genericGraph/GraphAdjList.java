@@ -206,13 +206,14 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	@Override
 	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, double w)throws IllegalArgumentException {
-		if(adjList.containsKey(v1)) {
-			for(Edge<T> edge: adjList.get(v1)) {
-				if(edge.endVertex().equals(v2)){
-					edge.setWeight(w);
-					return;
-				}
+		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
+			Edge<T> e1 = getEdge(v1,v2);
+			e1.setWeight(w);
+			if(!isDirected) {
+				Edge<T> e2 = getEdge(v2,v1);
+				e2.setWeight(w);
 			}
+			return;
 		}
 		throw new IllegalArgumentException();
 	}
@@ -386,7 +387,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 		Set<Vertex<T>> vertexSet = new HashSet<Vertex<T>>();
 		while(!priorityQ.isEmpty()) {
 			Vertex<T> u = priorityQ.poll();
-			if(!vertexSet.contains(priorityQ.peek())) {
+			if(!vertexSet.contains(u)) {
 				for(Edge<T> e: adjList.get(u)) {
 					relax(u,e.endVertex());
 				}
@@ -470,9 +471,28 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 
 	@Override
-	public void prim() {
-		// TODO Auto-generated method stub
-		
+	public void prim(Vertex<T> r) {
+		for(Vertex<T> u :getVertices()) {
+			u.setD(INF);
+			u.setColor(Vertex.WHITE);
+		}
+		r.setD(0);
+		r.setPred(null);
+		Queue<Vertex<T>> q = new PriorityQueue<Vertex<T>>();
+		q.offer(r);
+		while(!q.isEmpty()) {
+			Vertex<T> u = q.poll();
+			for(Edge<T> e: adjList.get(u)) {
+				Vertex<T> v = e.endVertex();
+				if(v.getColor() == Vertex.WHITE && (e.getWeight() < v.getD())) {
+					v.setD(e.getWeight());
+					q.offer(v);
+					v.setPred(u);
+					
+				}
+				u.setColor(Vertex.BLACK);
+			}
+		}
 	}
 
 	@Override
