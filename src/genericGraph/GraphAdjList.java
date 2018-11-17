@@ -231,7 +231,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 				return edge;
 			}
 		}
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("Edge not found");
 	}
 	/**
 	 * Gets all of the edges in the graph
