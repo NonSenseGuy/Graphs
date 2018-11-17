@@ -23,8 +23,8 @@ public class GraphAdjList<T> implements IGraph<T>{
 	private int numVertices;
 	private int numEdges;
 	private final HashMap<Vertex<T>,Set<Edge<T>>> adjList;
-	private boolean isDirected;
-	private boolean isWeighted;
+	private final boolean isDirected;
+	private final boolean isWeighted;
 	private Vertex<T> refVertex;
 	private int time;
 	
@@ -123,6 +123,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	 */
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException{
+		if(!isWeighted) throw new IllegalArgumentException("Graph is not weighted");
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			if(!isDirected) {
 				adjList.get(v2).add(new Edge<T>(v2,v1, w));
@@ -280,7 +281,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 			u.setColor(Vertex.WHITE);
 			u.setPred(null);
 		}
-		time = 0;
 		for(Vertex<T> u: getVertices()) {
 			if(u.getColor() == Vertex.WHITE) {
 				dfsVisit(u);

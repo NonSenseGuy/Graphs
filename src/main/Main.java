@@ -36,9 +36,9 @@ public class Main {
 		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
 		graph.addEdge(graph.getVertex(1), graph.getVertex(6));
 		
-		graph.prim(graph.getVertex(2));
+		graph.dfs();
 		for(Vertex<Integer> v : graph.getVertices()) {
-			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getD());
+			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getF());
 		}
 		System.out.println("");
 		
