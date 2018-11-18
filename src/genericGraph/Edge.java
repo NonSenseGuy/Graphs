@@ -4,11 +4,21 @@ public class Edge<T> implements Comparable<Edge<T>>{
 	private Vertex<T> v1;
 	private Vertex<T> v2;
 	private double w;
+	private double d;
+	private Edge<T> pred;
 	
 	public Edge(Vertex<T> v1, Vertex<T> v2, double w) {
 		this.v1 = v1; 
 		this.v2 = v2;
 		this.w = w;
+	}
+	
+	public Edge<T> getPred(){
+		return pred;
+	}
+	
+	public void setPred(Edge<T> e) {
+		pred = e;
 	}
 	
 	public Vertex<T> initVertex(){
@@ -27,6 +37,14 @@ public class Edge<T> implements Comparable<Edge<T>>{
 		this.w = w;
 	}
 	
+	public double getD() {
+		return d;
+	}
+
+	public void setD(double d) {
+		this.d = d;
+	}
+
 	@Override
 	public String toString() {
 		return "(" + v1 + "," + v2 + ")";

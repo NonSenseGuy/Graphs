@@ -3,13 +3,15 @@ package genericGraph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Queue;
+
 
 public class GraphMatrix<T> implements IGraph<T>{
 	
-	private Map<Vertex<T>, Integer> vertices;
+	private Map<T, Integer> vertices;
 	private List<Vertex<T>> verticesLookUp;
 	private double[][] adjMatrix;
 	private int index;
@@ -18,15 +20,16 @@ public class GraphMatrix<T> implements IGraph<T>{
 	
 	public GraphMatrix(int numVertices, boolean isDirected, boolean isWeighted) {
 		adjMatrix = new double[numVertices][numVertices];
-		Arrays.fill(adjMatrix, INF);
+		for(double[] row: adjMatrix) {
+			Arrays.fill(row, (double)INF);
+		}
 		index = 0;
-		vertices = new HashMap<Vertex<T>, Integer>();
+		vertices = new HashMap<T, Integer>();
 		verticesLookUp = new ArrayList<Vertex<T>>();
 		this.isDirected = isDirected;
 		this.isWeighted = isWeighted;
 	}
 
-	
 	
 	public List<Vertex<T>> getVerticesLookUp() {
 		return verticesLookUp;
@@ -64,7 +67,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 
 
-	public void setVertices(Map<Vertex<T>, Integer> vertices) {
+	public void setVertices(Map<T, Integer> vertices) {
 		this.vertices = vertices;
 	}
 
@@ -72,21 +75,21 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 	@Override
 	public void addVertex(Vertex<T> v) throws IllegalArgumentException {
-		if(vertices.containsKey(v)) {
+		if(vertices.containsKey(v.getValue())) {
 			throw new IllegalArgumentException("Vertex already exists in the graph");
 		}
-		vertices.put(v, index);
+		vertices.put(v.getValue(), index);
 		verticesLookUp.add(v);
 		index++;
 	}
 
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
-		if(!vertices.containsKey(v1) || vertices.containsKey(v2)) {
+		if(!vertices.containsKey(v1.getValue()) || !vertices.containsKey(v2.getValue())) {
 			throw new IllegalArgumentException("Vertex not found");
 		}
-		int indexV1 = vertices.get(v1);
-		int indexV2 = vertices.get(v2);
+		int indexV1 = vertices.get(v1.getValue());
+		int indexV2 = vertices.get(v2.getValue());
 		adjMatrix[indexV1][indexV2] = 1;
 		if(!isDirected) {
 			adjMatrix[indexV2][indexV1] = 1;
@@ -95,11 +98,12 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 	@Override
 	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException {
-		if(!vertices.containsKey(v1) || !vertices.containsKey(v2)) {
+		if(!isWeighted) throw new IllegalArgumentException();
+		if(!vertices.containsKey(v1.getValue()) || !vertices.containsKey(v2.getValue())) {
 			throw new IllegalArgumentException("Vertex not found");
 		}
-		int indexV1 = vertices.get(v1);
-		int indexV2 = vertices.get(v2);
+		int indexV1 = vertices.get(v1.getValue());
+		int indexV2 = vertices.get(v2.getValue());
 		adjMatrix[indexV1][indexV2] = w;
 		if(!isDirected) {
 			adjMatrix[indexV2][indexV1] = w;
@@ -108,130 +112,215 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 	@Override
 	public void removeEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
-		if(!vertices.containsKey(v1) || !vertices.containsKey(v2)) {
+		if(!vertices.containsKey(v1.getValue()) || !vertices.containsKey(v2.getValue())) {
 			throw new IllegalArgumentException("Vertex not found");
 		}
-		
-		
+		int indexV1 = vertices.get(v1.getValue());
+		int indexV2 = vertices.get(v2.getValue());
+		adjMatrix[indexV1][indexV2] = INF;
+		if(!isDirected) {
+			adjMatrix[indexV2][indexV1] = INF;
+		}
 	}
 
 	@Override
 	public Vertex<T> getVertex(T valueVertex) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+		if(vertices.containsKey(valueVertex)) {
+			return verticesLookUp.get(vertices.get(valueVertex));
+		}
+		throw new IllegalArgumentException("Vertex not found");
 	}
 
 	@Override
 	public Iterable<Vertex<T>> getVertices() {
-		// TODO Auto-generated method stub
-		return null;
+		return verticesLookUp;
 	}
 
 	@Override
 	public double getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return 0;
+		int indexV1 = vertices.get(v1.getValue());
+		int indexV2 = vertices.get(v2.getValue());
+		return adjMatrix[indexV1][indexV2];
 	}
 
 	@Override
 	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
+		int indexV1 = vertices.get(v1.getValue());
+		int indexV2 = vertices.get(v2.getValue());
+		adjMatrix[indexV1][indexV2] = w;
 		
 	}
-
 	@Override
 	public void bfs(Vertex<T> startVertex) {
-		// TODO Auto-generated method stub
+		if(!vertices.containsKey(startVertex.getValue())) {
+			throw new IllegalArgumentException("Vertex not found");
+		}
+		for(Vertex<T> u: getVertices()) {
+			if(!u.equals(startVertex)) {
+				u.setColor(Vertex.WHITE);
+				u.setD(INF);
+				u.setPred(null);
+			}
+		}
+		startVertex.setColor(Vertex.GRAY);
+		startVertex.setD(0);
+		startVertex.setPred(null);
+		Queue<Vertex<T>> queue = new LinkedList<Vertex<T>>();
+		queue.offer(startVertex);
+		while(!queue.isEmpty()) {
+			Vertex<T> u = queue.poll();
+			int index = vertices.get(u.getValue());
+			for(int i = 0; i < vertices.size(); i++) {
+				if(i != index) {
+					if(adjMatrix[index][i] != INF) {
+						Vertex<T> v = verticesLookUp.get(i);
+						if(v.getColor() == Vertex.WHITE) {
+							v.setColor(Vertex.GRAY);
+							v.setD(u.getD());
+							v.setPred(u);
+							queue.offer(v);
+						}
+					}
+				}
+			}
+			u.setColor(Vertex.BLACK);
+		}
 		
 	}
 
 	@Override
-	public boolean bellmanford(Vertex<T> starVertex) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void removeVertex(Vertex<T> v) {
-		// TODO Auto-generated method stub
+	public boolean bellmanford(Vertex<T> startVertex) {
+		for(Vertex<T> v : verticesLookUp) {
+			v.setD(INF);
+			v.setPred(null);
+		}
+		startVertex.setD(0);
 		
+		for(Vertex<T> v: verticesLookUp) {
+			int i = verticesLookUp.indexOf(v);
+			for(int j = 0; j < vertices.size(); j++) {
+				double tempDistance = verticesLookUp.get(j).getD() + adjMatrix[i][j];
+				if(tempDistance < v.getD()) {
+					v.setD(tempDistance);
+					v.setPred(verticesLookUp.get(j));
+				}
+			}
+		}
+		for(int i = 0; i < vertices.size(); i++) {
+			for(int j = 0; j < vertices.size(); j++) {
+				if(i != j && adjMatrix[i][j] != INF) {
+					if(verticesLookUp.get(i).getD() + adjMatrix[i][j] < verticesLookUp.get(j).getD()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
 	public void dfs() {
-		// TODO Auto-generated method stub
-		
+		for(Vertex<T> v : verticesLookUp) {
+			v.setColor(Vertex.WHITE);
+		}
+		for(Vertex<T> u: verticesLookUp) {
+			if(u.getColor() == Vertex.WHITE) {
+				dfsVisit(u);
+			}
+		}
+	}
+	
+	public void dfsVisit(Vertex<T> u) {
+		u.setColor(Vertex.BLACK);
+		int indexU = vertices.get(u);
+		for(int i = 0; i < vertices.size(); i++) {
+			if(i != indexU) {
+				Vertex<T> v = verticesLookUp.get(i);
+				if(adjMatrix[indexU][i] != INF && v.getColor() == Vertex.WHITE) {
+					v.setPred(u);
+					dfsVisit(v);
+				}
+			}
+		}
 	}
 
 	@Override
 	public boolean areAdjacent(Vertex<T> v1, Vertex<T> v2) {
-		// TODO Auto-generated method stub
-		return false;
+		int indexV1 = vertices.get(v1);
+		int indexV2 = vertices.get(v2);
+		
+		return adjMatrix[indexV1][indexV2] == INF ? false:true;
+	}
+	
+	public List<Vertex<T>> getAdjacentVertices(Vertex<T> v){
+		int index = vertices.get(v.getValue());
+		List<Vertex<T>> result = new ArrayList<Vertex<T>>();
+		for(int i = 0; i < adjMatrix[index].length; i++) {
+			if(adjMatrix[index][i] != INF) {
+				result.add(verticesLookUp.get(i));
+			}
+		}
+		return result;
 	}
 
-	@Override
-	public Set<Vertex<T>> adjacentVertices(Vertex<T> v) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void dijkstra(Vertex<T> s) {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void initializeSingleSource(Vertex<T> s) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void relax(Vertex<T> s, Vertex<T> e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Iterable<Edge<T>> getEdges() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
 	public int getNumVertices() {
-		// TODO Auto-generated method stub
-		return 0;
+		return vertices.size();
 	}
 
 	@Override
 	public int getNumEdges() {
-		// TODO Auto-generated method stub
-		return 0;
+		int numEdges = 0;
+		for(int i = 0; i < vertices.size(); i++) {
+			for(int j = 0; j < vertices.size(); j++) {
+				if(j != i && adjMatrix[i][j] != INF) {
+					numEdges++;
+				}
+			}
+		}
+		return numEdges;
 	}
 
 	@Override
-	public ArrayList<Vertex<T>> vertexPath(Vertex<T> startVertex, Vertex<T> endVertex) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	public double[][] floydWarshall(){
+		double[][] weightMatrix = adjMatrix;
+		for(int k = 0; k < weightMatrix.length; k++) {
+			for(int i = 0; i < weightMatrix.length; i++) {
+				for(int j = 0; j < weightMatrix.length; j++) {
+					if(weightMatrix[i][j] > weightMatrix[i][k] + weightMatrix[k][j]) {
+						weightMatrix[i][j] = weightMatrix[i][k] + weightMatrix[k][j];
+					}
+				}
+			}
+		}
+		return weightMatrix;
 	}
-
+	
+	
 	@Override
-	public void floydwarshall() {
-		// TODO Auto-generated method stub
+	public String toString() {
+		String msg = "";
+		for(int i = 0; i < vertices.size(); i++) {
+			if(verticesLookUp.get(i) != null) {
+				msg += verticesLookUp.get(i) + "-> ";
+			}
+			for(int j = 0; j < vertices.size(); j++) {
+				if(j != i) {
+					if(verticesLookUp.get(j) != null) {
+						msg += "(" + verticesLookUp.get(j) + "," + adjMatrix[i][j] + "), ";  
+					}	
+				}
+			}
+			msg+= "\n";
+		}
+		return msg;
 		
-	}
-
-	@Override
-	public void kruskal() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void prim(Vertex<T> v) {
-		// TODO Auto-generated method stub
 		
 	}
 

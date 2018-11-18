@@ -1,18 +1,17 @@
 package main;
 
+import java.util.Arrays;
+
 import genericGraph.Edge;
 import genericGraph.GraphAdjList;
-import genericGraph.GraphAdjMatrix;
 import genericGraph.Vertex;
 
 public class Main {
 	
 	static GraphAdjList<Integer> graph;
-	static GraphAdjMatrix<Integer> graphMat;
 	
 	public static void main(String[] args) {
-		graph = new GraphAdjList<>(false, false);
-		graphMat = new GraphAdjMatrix<>(4, false);
+		graph = new GraphAdjList<>(false, true);
 	
 		graph.addVertex(new Vertex<Integer>(1));
 		graph.addVertex(new Vertex<Integer>(2));
@@ -36,12 +35,22 @@ public class Main {
 		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
 		graph.addEdge(graph.getVertex(1), graph.getVertex(6));
 		
-		graph.dfs();
-		for(Vertex<Integer> v : graph.getVertices()) {
-			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getF());
+//		graph.dfs();
+//		for(Vertex<Integer> v : graph.getVertices()) {
+//			System.out.println("(" + v + "," + v.getPred() + ")" + " Distancia -> " + v.getF());
+//		}
+//		System.out.println("");
+		double[][] matrix = graph.getWeightsMatrix();
+		for(int i = 0; i < graph.vertices().size(); i++) {
+			System.out.println(graph.vertices().get(i));
 		}
-		System.out.println("");
+		for(double[] row: matrix) {
+			System.out.println(Arrays.toString(row));
+		}
 		
+//		for(Edge<Integer> e: graph.getEdges()) {
+//			System.out.println(e + " Pred ->" + e.getPred() + " Distance ->" + e.getD());
+//		}
 		
 		System.out.println(graph);
 //		

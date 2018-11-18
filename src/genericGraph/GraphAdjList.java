@@ -1,6 +1,8 @@
 package genericGraph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -138,7 +140,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 	/**
 	 * Removes a vertex and all of its associated edges of the graph
 	 */
-	@Override
 	public void removeVertex(Vertex<T> v) throws IllegalArgumentException{
 		if(adjList.containsKey(v)) {
 			for(Edge<T> e: getEdges()) {
@@ -189,6 +190,14 @@ public class GraphAdjList<T> implements IGraph<T>{
 	@Override
 	public Iterable<Vertex<T>> getVertices() {
 		return adjList.keySet();
+	}
+	
+	public ArrayList<Vertex<T>> vertices(){
+		ArrayList<Vertex<T>> vertices = new ArrayList<>();
+		for(Vertex<T> v: getVertices()) {
+			vertices.add(v);
+		}
+		return vertices;
 	}
 	/**
 	 * Gets the weight of a given edge
@@ -328,7 +337,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return true;
 	}
 	
-	@Override
 	public void initializeSingleSource(Vertex<T> s) {
 		for(Vertex<T> v: getVertices()) {
 			v.setD(INF);
@@ -337,7 +345,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 		s.setD(0);
 	}
 	
-	@Override
 	public void relax(Vertex<T> u,Vertex<T> v) {
 		double tempDistance = u.getD() + getEdge(u,v).getWeight();
 		if(v.getD() > tempDistance) {
@@ -361,7 +368,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return false;
 	}
 	
-	@Override
 	public Set<Vertex<T>> adjacentVertices(Vertex<T> v) throws IllegalArgumentException{
 		if(!adjList.containsKey(v)) {
 			throw new IllegalArgumentException("Vertex not found");
@@ -395,34 +401,12 @@ public class GraphAdjList<T> implements IGraph<T>{
 			}
 		}
 	}
-//	
-//	public void dijkstra2(Vertex<T> s) throws IllegalArgumentException{
-//		if(!adjList.containsKey(s)) {
-//			throw new IllegalArgumentException("Vertex not found");
-//		}
-//		initializeSingleSource(s);
-//		Set<Vertex<T>> unsettledVertex = new HashSet<Vertex<T>>();
-//		Set<Vertex<T>> settledVertex = new HashSet<Vertex<T>>();
-//		unsettledVertex.add(s);
-//		while(!unsettledVertex.isEmpty()) {
-//			Vertex<T> evaluationVertex =  getVertexWithLowestIndex(unsettledVertex);
-//		}
-//	}
-	
-//	private Vertex<T> getVertexWithLowestDistance(Set<Vertex<T>> vertexSet){
-//		double min = INF;
-//		for(Vertex<T> v : vertexSet) {
-//			if(v.getD() < min) {
-//				
-//			}
-//		}
-//	}
+
 	/**
 	 * Gets all of the edges in the graph
 	 * @return edgesList
 	 */
-	@Override
-	public Iterable<Edge<T>> getEdges(){
+	public ArrayList<Edge<T>> getEdges(){
 		ArrayList<Edge<T>> edgesList = new ArrayList<Edge<T>>();
 		for(Vertex<T> v:getVertices()) {
 			for(Edge<T> e: adjList.get(v)) {
@@ -436,7 +420,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 	 * and a given vertex in the graph
 	 * Assuming that the graph is connected
 	 */
-	@Override
 	public ArrayList<Vertex<T>> vertexPath(Vertex<T> startVertex, Vertex<T> endVertex) throws IllegalArgumentException {
 		if(!adjList.containsKey(endVertex)) {
 			throw new IllegalArgumentException("Vertex not found");
@@ -464,13 +447,6 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return s;
 	}
 
-	@Override
-	public void floydwarshall() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void prim(Vertex<T> r) {
 		for(Vertex<T> u :getVertices()) {
 			u.setD(INF);
@@ -495,11 +471,59 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 	}
 
-	@Override
-	public void kruskal() {
-		// TODO Auto-generated method stub
+	
+	public ArrayList<Edge<T>> kruskal(){
+		ArrayList<Edge<T>> res = new ArrayList<>();
+		int a = 0;
+		int i = 0;
+		ArrayList<Vertex<T>> vertices = vertices();
+		ArrayList<Edge<T>> edgesList = getEdges();
+		Collections.sort(edgesList);
+		UnionFind u = new UnionFind(adjList.size());
 		
+		while(a < adjList.size() -1 && i < edgesList.size()) {
+			Edge<T> edge = edgesList.get(i);
+			i++;
+			int x = u.find(vertices.indexOf(edge.initVertex()));
+			int y = u.find(vertices.indexOf(edge.endVertex()));
+			if(x != y) {
+				res.add(edge);
+				u.union(x, y);
+			}
+		}
+		return res;
 	}
-
+	
+	public double[][] getWeightsMatrix(){
+		double[][] weightMatrix = new double[adjList.size()][adjList.size()];
+		for(double[] rows: weightMatrix) {
+			Arrays.fill(rows, INF);
+		}
+		for(int i = 0; i < adjList.size(); i++) {
+			weightMatrix[i][i] = 0;
+			Vertex<T> v = vertices().get(i);
+			for(Edge<T> e: adjList.get(v)) {
+				Vertex<T> u = e.endVertex();
+				double w = e.getWeight();
+				weightMatrix[i][vertices().indexOf(u)] = w;
+			}
+		}
+		
+		return weightMatrix;
+	}
+	@Override
+	public double[][] floydWarshall(){
+		double[][] weightMatrix = getWeightsMatrix();
+		for(int k = 0; k < weightMatrix.length; k++) {
+			for(int i = 0; i < weightMatrix.length; i++) {
+				for(int j = 0; j < weightMatrix.length; j++) {
+					if(weightMatrix[i][j] > weightMatrix[i][k] + weightMatrix[k][j]) {
+						weightMatrix[i][j] = weightMatrix[i][k] + weightMatrix[k][j];
+					}
+				}
+			}
+		}
+		return weightMatrix;
+	}
 	
 }
