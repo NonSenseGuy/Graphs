@@ -14,6 +14,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 	private Map<T, Integer> vertices;
 	private List<Vertex<T>> verticesLookUp;
 	private double[][] adjMatrix;
+	private double[][] distMatrix;
 	private int index;
 	private final boolean isDirected;
 	private final boolean isWeighted;
@@ -23,6 +24,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 		for(double[] row: adjMatrix) {
 			Arrays.fill(row, (double)INF);
 		}
+		distMatrix = adjMatrix.clone();
 		index = 0;
 		vertices = new HashMap<T, Integer>();
 		verticesLookUp = new ArrayList<Vertex<T>>();
@@ -266,7 +268,9 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 	@Override
 	public void dijkstra(Vertex<T> s) {
-		
+		ShortestPath sp = new ShortestPath();
+		int src = vertices.get(s.getValue());
+		sp.dijkstra(distMatrix, src);
 	}
 
 	@Override
@@ -322,6 +326,46 @@ public class GraphMatrix<T> implements IGraph<T>{
 		return msg;
 		
 		
+	}
+	
+	private class ShortestPath{
+		
+		private int minDistance(double[] dist, boolean sptSet[]) {
+			double min = INF;
+			int min_index = -1;
+			for(int i = 0; i < verticesLookUp.size(); i++) {
+				if(sptSet[i] == false && dist[i] < min) {
+					min = dist[i];
+					min_index = i;
+				}
+			}
+			
+			return min_index;
+		}
+		
+		private void dijkstra(double[][] graph, int src) {
+			double[] dist = new double[verticesLookUp.size()];
+			boolean[] sptSet = new boolean[verticesLookUp.size()];
+			
+			for(int i = 0; i < verticesLookUp.size(); i++) {
+				dist[i] = INF;
+				sptSet[i] = false;
+			}
+			
+			dist[src] = 0;
+			int u = -1;
+			for(int count = 0; count < verticesLookUp.size() -1; count++) {
+				u = minDistance(dist,sptSet);
+				sptSet[u] = true;
+				for(int v = 0; v < verticesLookUp.size(); v++) {
+					if(!sptSet[v] && graph[u][v] != 0 && dist[u] != INF && dist[u] + graph[u][v] < dist[v]) {
+						dist[v] = dist[u] + graph[u][v];
+					}
+				}
+			}
+			distMatrix[u] = dist;
+			
+		}
 	}
 
 }
