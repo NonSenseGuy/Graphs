@@ -24,6 +24,9 @@ public class GraphMatrix<T> implements IGraph<T>{
 		for(double[] row: adjMatrix) {
 			Arrays.fill(row, (double)INF);
 		}
+		for(int i = 0; i < numVertices; i++) {
+			adjMatrix[i][i] = 0;
+		}
 		distMatrix = adjMatrix.clone();
 		index = 0;
 		vertices = new HashMap<T, Integer>();
@@ -73,7 +76,10 @@ public class GraphMatrix<T> implements IGraph<T>{
 		this.vertices = vertices;
 	}
 
-
+	public void addVertex(T v) {
+		Vertex<T> vertex = new Vertex<T>(v);
+		addVertex(vertex);
+	}
 
 	@Override
 	public void addVertex(Vertex<T> v) throws IllegalArgumentException {
@@ -123,6 +129,10 @@ public class GraphMatrix<T> implements IGraph<T>{
 		if(!isDirected) {
 			adjMatrix[indexV2][indexV1] = INF;
 		}
+	}
+	
+	public double[][] getDistMatrix(){
+		return distMatrix;
 	}
 
 	@Override
@@ -294,6 +304,8 @@ public class GraphMatrix<T> implements IGraph<T>{
 	@Override
 	public double[][] floydWarshall(){
 		double[][] weightMatrix = adjMatrix;
+		
+		
 		for(int k = 0; k < weightMatrix.length; k++) {
 			for(int i = 0; i < weightMatrix.length; i++) {
 				for(int j = 0; j < weightMatrix.length; j++) {
@@ -303,6 +315,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 				}
 			}
 		}
+		distMatrix = weightMatrix;
 		return weightMatrix;
 	}
 	
@@ -360,10 +373,12 @@ public class GraphMatrix<T> implements IGraph<T>{
 				for(int v = 0; v < verticesLookUp.size(); v++) {
 					if(!sptSet[v] && graph[u][v] != 0 && dist[u] != INF && dist[u] + graph[u][v] < dist[v]) {
 						dist[v] = dist[u] + graph[u][v];
+						verticesLookUp.get(v).setD(dist[u] + graph[u][v]);
+						verticesLookUp.get(v).setPred(verticesLookUp.get(u));
 					}
 				}
 			}
-			distMatrix[u] = dist;
+			distMatrix[src] = dist;
 			
 		}
 	}
