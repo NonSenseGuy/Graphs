@@ -381,6 +381,38 @@ public class GraphMatrix<T> implements IGraph<T>{
 			distMatrix[src] = dist;
 			
 		}
+		
+		private boolean bellmanford(double[][] graph, int src) {
+			double[] dist = new double[verticesLookUp.size()];
+			boolean[] sptSet = new boolean[verticesLookUp.size()];
+			for(int i = 0; i < verticesLookUp.size(); i++) {
+				dist[i] = INF;
+				sptSet[i] = false;
+			}
+			dist[src] = 0;
+			int u = -1;
+			for(int count = 0; count < verticesLookUp.size() -1; count++) {
+				u = minDistance(dist,sptSet);
+				sptSet[u] = true;
+				for(int v = 0; v < verticesLookUp.size(); v++) {
+					if(!sptSet[v] && graph[u][v] != 0 && dist[u] != INF && dist[u] + graph[u][v] < dist[v]) {
+						dist[v] = dist[u] + graph[u][v];
+						verticesLookUp.get(v).setD(dist[u] + graph[u][v]);
+						verticesLookUp.get(v).setPred(verticesLookUp.get(u));
+					}
+				}
+			}
+			
+			for(int v = 0; v < verticesLookUp.size(); v++) {
+				if(!sptSet[v] && graph[u][v] != 0 && dist[u] != INF && dist[u] + graph[u][v] < dist[v]) {
+					return false;
+				}
+			}
+			distMatrix[src] = dist;
+			return true;
+			
+			
+		}
 	}
 
 }
