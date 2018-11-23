@@ -111,9 +111,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 	public void addEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException{
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			if(!isDirected) {
-				adjList.get(v2).add(new Edge<T>(v2,v1, 1.0));
+				adjList.get(v2).add(new Edge<T>(v2,v1, 1));
 			}
-			adjList.get(v1).add(new Edge<T>(v1,v2, 1.0));
+			adjList.get(v1).add(new Edge<T>(v1,v2, 1));
 			numEdges++;
 		}else {
 			throw new IllegalArgumentException();
@@ -124,7 +124,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	 * Adds a edge between a pair of vertices with weight w
 	 */
 	@Override
-	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException{
+	public void addEdge(Vertex<T> v1, Vertex<T> v2, int w) throws IllegalArgumentException{
 		if(!isWeighted) throw new IllegalArgumentException("Graph is not weighted");
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			if(!isDirected) {
@@ -204,7 +204,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	 * @return weight
 	 */
 	@Override
-	public double getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
+	public int getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
 		if(adjList.containsKey(v1)) {
 			for(Edge<T> edge: adjList.get(v1)) {
 				if(edge.endVertex().equals(v2)){
@@ -215,7 +215,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 		throw new IllegalArgumentException();
 	}
 	@Override
-	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, double w)throws IllegalArgumentException {
+	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, int w)throws IllegalArgumentException {
 		if(adjList.containsKey(v1) && adjList.containsKey(v2)) {
 			Edge<T> e1 = getEdge(v1,v2);
 			e1.setWeight(w);
@@ -346,7 +346,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 	}
 	
 	public void relax(Vertex<T> u,Vertex<T> v) {
-		double tempDistance = u.getD() + getEdge(u,v).getWeight();
+		int tempDistance = u.getD() + getEdge(u,v).getWeight();
 		if(v.getD() > tempDistance) {
 			v.setD(tempDistance);
 			v.setPred(u);
@@ -446,8 +446,10 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 		return s;
 	}
-
+	
+	@Override
 	public void prim(Vertex<T> r) {
+//		ArrayList<Edge<T>> edges= new ArrayList<>();
 		for(Vertex<T> u :getVertices()) {
 			u.setD(INF);
 			u.setColor(Vertex.WHITE);
@@ -464,6 +466,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 					v.setD(e.getWeight());
 					q.offer(v);
 					v.setPred(u);
+//					edges.add(e);
 					
 				}
 				u.setColor(Vertex.BLACK);
@@ -471,7 +474,8 @@ public class GraphAdjList<T> implements IGraph<T>{
 		}
 	}
 
-	
+	//Does not count subGraphs with only one vertex
+	@Override
 	public ArrayList<Edge<T>> kruskal(){
 		ArrayList<Edge<T>> res = new ArrayList<>();
 		int a = 0;
@@ -494,9 +498,9 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return res;
 	}
 	
-	public double[][] getWeightsMatrix(){
-		double[][] weightMatrix = new double[adjList.size()][adjList.size()];
-		for(double[] rows: weightMatrix) {
+	public int[][] getWeightsMatrix(){
+		int[][] weightMatrix = new int[adjList.size()][adjList.size()];
+		for(int[] rows: weightMatrix) {
 			Arrays.fill(rows, INF);
 		}
 		for(int i = 0; i < adjList.size(); i++) {
@@ -504,7 +508,7 @@ public class GraphAdjList<T> implements IGraph<T>{
 			Vertex<T> v = vertices().get(i);
 			for(Edge<T> e: adjList.get(v)) {
 				Vertex<T> u = e.endVertex();
-				double w = e.getWeight();
+				int w = e.getWeight();
 				weightMatrix[i][vertices().indexOf(u)] = w;
 			}
 		}
@@ -512,8 +516,8 @@ public class GraphAdjList<T> implements IGraph<T>{
 		return weightMatrix;
 	}
 	@Override
-	public double[][] floydWarshall(){
-		double[][] weightMatrix = getWeightsMatrix();
+	public int[][] floydWarshall(){
+		int[][] weightMatrix = getWeightsMatrix();
 		for(int k = 0; k < weightMatrix.length; k++) {
 			for(int i = 0; i < weightMatrix.length; i++) {
 				for(int j = 0; j < weightMatrix.length; j++) {

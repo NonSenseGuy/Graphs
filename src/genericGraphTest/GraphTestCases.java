@@ -19,7 +19,7 @@ class GraphTestCases {
 	}
 	
 	void setupBellmanford() {
-		setupDirectedGraph();
+		setupDirectedWeightedGraph();
 		Vertex<Integer> v1 = new Vertex<Integer>(1);
 		Vertex<Integer> v2 = new Vertex<Integer>(2);
 		Vertex<Integer> v3 = new Vertex<Integer>(3);
@@ -91,9 +91,9 @@ class GraphTestCases {
 		graph.addVertex(v1);
 		graph.addVertex(v2);
 		graph.addVertex(v3);
-		graph.addEdge(v1, v3, 3.0);
-		graph.addEdge(v2, v1, 10.0);
-		graph.addEdge(v3, v2, 5.0);
+		graph.addEdge(v1, v3, 3);
+		graph.addEdge(v2, v1, 10);
+		graph.addEdge(v3, v2, 5);
 		graph.addEdge(graph.getVertex(1), v3, 20);
 		graph.addEdge(graph.getVertex(1), graph.getVertex(2), 2);
 		graph.addEdge(graph.getVertex(1), graph.getVertex(6));

@@ -3,23 +3,15 @@ package genericGraph;
 public class Edge<T> implements Comparable<Edge<T>>{
 	private Vertex<T> v1;
 	private Vertex<T> v2;
-	private double w;
-	private double d;
-	private Edge<T> pred;
+	private int w;
+
 	
-	public Edge(Vertex<T> v1, Vertex<T> v2, double w) {
+	public Edge(Vertex<T> v1, Vertex<T> v2, int w) {
 		this.v1 = v1; 
 		this.v2 = v2;
 		this.w = w;
 	}
 	
-	public Edge<T> getPred(){
-		return pred;
-	}
-	
-	public void setPred(Edge<T> e) {
-		pred = e;
-	}
 	
 	public Vertex<T> initVertex(){
 		return v1;
@@ -29,21 +21,14 @@ public class Edge<T> implements Comparable<Edge<T>>{
 		return v2;
 	}
 	
-	public double getWeight() {
+	public int getWeight() {
 		return w;
 	}
 	
-	public void setWeight(double w) {
+	public void setWeight(int w) {
 		this.w = w;
 	}
-	
-	public double getD() {
-		return d;
-	}
 
-	public void setD(double d) {
-		this.d = d;
-	}
 
 	@Override
 	public String toString() {

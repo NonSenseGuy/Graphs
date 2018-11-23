@@ -5,7 +5,7 @@ public class Vertex<T> implements Comparable<Vertex<T>> {
 	public final static int GRAY = 1;
 	public final static int BLACK = 2;
 	private T value;
-	private double d;
+	private int d;
 	private int f;
 	private int color;
 	private Vertex<T> pred;
@@ -22,11 +22,11 @@ public class Vertex<T> implements Comparable<Vertex<T>> {
 		this.value = value;
 	}
 
-	public double getD() {
+	public int getD() {
 		return d;
 	}
 
-	public void setD(double d) {
+	public void setD(int d) {
 		this.d = d;
 	}
 

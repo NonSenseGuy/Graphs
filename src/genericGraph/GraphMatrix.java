@@ -2,27 +2,31 @@ package genericGraph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
+
+
 
 
 public class GraphMatrix<T> implements IGraph<T>{
 	
 	private Map<T, Integer> vertices;
 	private List<Vertex<T>> verticesLookUp;
-	private double[][] adjMatrix;
-	private double[][] distMatrix;
+	private int[][] adjMatrix;
+	private int[][] distMatrix;
 	private int index;
 	private final boolean isDirected;
 	private final boolean isWeighted;
 	
 	public GraphMatrix(int numVertices, boolean isDirected, boolean isWeighted) {
-		adjMatrix = new double[numVertices][numVertices];
-		for(double[] row: adjMatrix) {
-			Arrays.fill(row, (double)INF);
+		adjMatrix = new int[numVertices][numVertices];
+		for(int[] row: adjMatrix) {
+			Arrays.fill(row,INF);
 		}
 		for(int i = 0; i < numVertices; i++) {
 			adjMatrix[i][i] = 0;
@@ -48,13 +52,13 @@ public class GraphMatrix<T> implements IGraph<T>{
 
 
 
-	public double[][] getAdjMatrix() {
+	public int[][] getAdjMatrix() {
 		return adjMatrix;
 	}
 
 
 
-	public void setAdjMatrix(double[][] adjMatrix) {
+	public void setAdjMatrix(int[][] adjMatrix) {
 		this.adjMatrix = adjMatrix;
 	}
 
@@ -105,7 +109,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 	}
 
 	@Override
-	public void addEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException {
+	public void addEdge(Vertex<T> v1, Vertex<T> v2, int w) throws IllegalArgumentException {
 		if(!isWeighted) throw new IllegalArgumentException();
 		if(!vertices.containsKey(v1.getValue()) || !vertices.containsKey(v2.getValue())) {
 			throw new IllegalArgumentException("Vertex not found");
@@ -131,7 +135,7 @@ public class GraphMatrix<T> implements IGraph<T>{
 		}
 	}
 	
-	public double[][] getDistMatrix(){
+	public int[][] getDistMatrix(){
 		return distMatrix;
 	}
 
@@ -149,14 +153,14 @@ public class GraphMatrix<T> implements IGraph<T>{
 	}
 
 	@Override
-	public double getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
+	public int getWeightEdge(Vertex<T> v1, Vertex<T> v2) throws IllegalArgumentException {
 		int indexV1 = vertices.get(v1.getValue());
 		int indexV2 = vertices.get(v2.getValue());
 		return adjMatrix[indexV1][indexV2];
 	}
 
 	@Override
-	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, double w) throws IllegalArgumentException {
+	public void setWeightEdge(Vertex<T> v1, Vertex<T> v2, int w) throws IllegalArgumentException {
 		int indexV1 = vertices.get(v1.getValue());
 		int indexV2 = vertices.get(v2.getValue());
 		adjMatrix[indexV1][indexV2] = w;
@@ -199,35 +203,12 @@ public class GraphMatrix<T> implements IGraph<T>{
 		}
 		
 	}
-
+	
 	@Override
 	public boolean bellmanford(Vertex<T> startVertex) {
-		for(Vertex<T> v : verticesLookUp) {
-			v.setD(INF);
-			v.setPred(null);
-		}
-		startVertex.setD(0);
-		
-		for(Vertex<T> v: verticesLookUp) {
-			int i = verticesLookUp.indexOf(v);
-			for(int j = 0; j < vertices.size(); j++) {
-				double tempDistance = verticesLookUp.get(j).getD() + adjMatrix[i][j];
-				if(tempDistance < v.getD()) {
-					v.setD(tempDistance);
-					v.setPred(verticesLookUp.get(j));
-				}
-			}
-		}
-		for(int i = 0; i < vertices.size(); i++) {
-			for(int j = 0; j < vertices.size(); j++) {
-				if(i != j && adjMatrix[i][j] != INF) {
-					if(verticesLookUp.get(i).getD() + adjMatrix[i][j] < verticesLookUp.get(j).getD()) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
+		ShortestPath sp = new ShortestPath();
+		int src = vertices.get(startVertex.getValue());
+		return sp.bellmanford(distMatrix, src);
 	}
 
 	@Override
@@ -264,11 +245,11 @@ public class GraphMatrix<T> implements IGraph<T>{
 		return adjMatrix[indexV1][indexV2] == INF ? false:true;
 	}
 	
-	public List<Vertex<T>> getAdjacentVertices(Vertex<T> v){
+	public ArrayList<Vertex<T>> getAdjacentVertices(Vertex<T> v){
 		int index = vertices.get(v.getValue());
-		List<Vertex<T>> result = new ArrayList<Vertex<T>>();
+		ArrayList<Vertex<T>> result = new ArrayList<Vertex<T>>();
 		for(int i = 0; i < adjMatrix[index].length; i++) {
-			if(adjMatrix[index][i] != INF) {
+			if(adjMatrix[index][i] != INF && adjMatrix[index][i] != 0) {
 				result.add(verticesLookUp.get(i));
 			}
 		}
@@ -302,8 +283,8 @@ public class GraphMatrix<T> implements IGraph<T>{
 	}
 
 	@Override
-	public double[][] floydWarshall(){
-		double[][] weightMatrix = adjMatrix;
+	public int[][] floydWarshall(){
+		int[][] weightMatrix = adjMatrix.clone();
 		
 		
 		for(int k = 0; k < weightMatrix.length; k++) {
@@ -319,6 +300,72 @@ public class GraphMatrix<T> implements IGraph<T>{
 		return weightMatrix;
 	}
 	
+	@Override
+	public void prim(Vertex<T> r){
+		for(Vertex<T> v : verticesLookUp) {
+			v.setD(INF);
+			v.setPred(null);
+			v.setColor(Vertex.WHITE);
+		}
+		r.setD(0);
+		r.setPred(null);
+		PriorityQueue<Vertex<T>> q = new PriorityQueue<>();
+		q.offer(r);
+		while(!q.isEmpty()) {
+			Vertex<T> u = q.poll();
+			ArrayList<Vertex<T>> adjVertices = getAdjacentVertices(u);
+			for(Vertex<T> v : adjVertices) {
+				int w = getEdgeWeight(u,v);
+				if(v.getColor() == Vertex.WHITE && w < v.getD()) {
+					v.setD(w);
+					q.offer(v);
+					v.setPred(u);
+					
+				}
+				u.setColor(Vertex.BLACK);
+			}
+		}
+	}
+	
+	public int getEdgeWeight(Vertex<T> u, Vertex<T> v) {
+		int posU = vertices.get(u.getValue());
+		int posV = vertices.get(v.getValue());
+		return distMatrix[posU][posV];
+	}
+	
+	@Override
+	public ArrayList<Edge<T>> kruskal(){
+		ArrayList<Edge<T>> res = new ArrayList<>();
+		int a = 0;
+		int i = 0;
+		ArrayList<Edge<T>> edgesList = getEdges();
+		Collections.sort(edgesList);
+		UnionFind u = new UnionFind(verticesLookUp.size());
+		
+		while(a < verticesLookUp.size() -1 && i < edgesList.size()) {
+			Edge<T> edge = edgesList.get(i);
+			i++;
+			int x = u.find(verticesLookUp.indexOf(edge.initVertex()));
+			int y = u.find(verticesLookUp.indexOf(edge.endVertex()));
+			if(x != y) {
+				res.add(edge);
+				u.union(x, y);
+			}
+		}
+		return res;
+	}
+	
+	public ArrayList<Edge<T>> getEdges(){
+		ArrayList<Edge<T>> edges = new ArrayList<>();
+		for(int i = 0; i < adjMatrix.length; i++) {
+			for(int j = 0; j < adjMatrix[0].length; j++) {
+				if(adjMatrix[i][j] == 1) {
+					edges.add(new Edge<T>(verticesLookUp.get(i), verticesLookUp.get(j), distMatrix[i][j]));
+				}
+			}
+		}
+		return edges;
+	}
 	
 	@Override
 	public String toString() {
@@ -343,8 +390,8 @@ public class GraphMatrix<T> implements IGraph<T>{
 	
 	private class ShortestPath{
 		
-		private int minDistance(double[] dist, boolean sptSet[]) {
-			double min = INF;
+		private int minDistance(int[] dist, boolean sptSet[]) {
+			int min = INF;
 			int min_index = -1;
 			for(int i = 0; i < verticesLookUp.size(); i++) {
 				if(sptSet[i] == false && dist[i] < min) {
@@ -356,8 +403,8 @@ public class GraphMatrix<T> implements IGraph<T>{
 			return min_index;
 		}
 		
-		private void dijkstra(double[][] graph, int src) {
-			double[] dist = new double[verticesLookUp.size()];
+		private void dijkstra(int[][] graph, int src) {
+			int[] dist = new int[verticesLookUp.size()];
 			boolean[] sptSet = new boolean[verticesLookUp.size()];
 			
 			for(int i = 0; i < verticesLookUp.size(); i++) {
@@ -382,8 +429,8 @@ public class GraphMatrix<T> implements IGraph<T>{
 			
 		}
 		
-		private boolean bellmanford(double[][] graph, int src) {
-			double[] dist = new double[verticesLookUp.size()];
+		private boolean bellmanford(int[][] graph, int src) {
+			int[] dist = new int[verticesLookUp.size()];
 			boolean[] sptSet = new boolean[verticesLookUp.size()];
 			for(int i = 0; i < verticesLookUp.size(); i++) {
 				dist[i] = INF;
